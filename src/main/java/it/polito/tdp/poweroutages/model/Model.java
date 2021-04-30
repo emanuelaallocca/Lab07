@@ -50,12 +50,10 @@ public class Model {
 		
 		if (numeroOre> massimoOre || numeroAnni>massimoAnni) 
 		{
-			System.out.println("*******");
 			return;
 		}
 		
 		if (numeroPersone> massimoPersoneSoluzione) {
-			System.out.println("****33333***");
 				soluzione = new ArrayList<>(parziale);
 				massimoPersoneSoluzione = numeroPersone;
 				numOreParziale = numeroOre;
@@ -64,7 +62,6 @@ public class Model {
 		}
 		
 		if (livello == partenza.size()) {
-			System.out.println("***fdknhdjbjid****");
 			return;
 		}
 		
