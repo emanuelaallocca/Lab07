@@ -50,17 +50,18 @@ public class PowerOutageDAO {
 			ResultSet res = st.executeQuery();
 
 			while (res.next()) {
-				PowerOutages p = new PowerOutages(res.getInt("id"),nerc.getId(),res.getTimestamp("date_event_began").toLocalDateTime(), res.getTimestamp("date_event_finished").toLocalDateTime(), res.getInt("costumers_affected"));
+				PowerOutages p = new PowerOutages(res.getInt("id"),nerc.getId(),res.getTimestamp("date_event_began").toLocalDateTime(), res.getTimestamp("date_event_finished").toLocalDateTime(), res.getInt("customers_affected"));
 				powerOutagesList.add(p);
 			}
 
 			conn.close();
+			return powerOutagesList;
 
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 
-		return powerOutagesList;
+		
 	}
 	
 	

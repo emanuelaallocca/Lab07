@@ -45,22 +45,26 @@ public class FXMLController {
     	try {
     		int maxOre = Integer.parseInt(this.txtHours.getText());
     		int maxAnni =Integer.parseInt(this.txtYears.getText());
+    		
     		Nerc n = this.cmbNerc.getValue();
     		
     		List<PowerOutages> blackout = model.trovaEventi(maxOre, maxAnni, n);
     		
-    		if(blackout == null) {
+    		if(blackout.isEmpty()) {
     			txtResult.appendText("Non ho trovato soluzioni\n");
     			return ;
     		}
     		txtResult.setStyle("-fx-font-family: monospace");
     		StringBuilder sb = new StringBuilder();
+    		sb.append(String.format("%-8d\n ", model.massimoPersoneSoluzione));
     		for (PowerOutages p: blackout) {
    
-    			sb.append(String.format("%-8s ", p.getId()));
+    			
+    			sb.append(String.format("%-8d ", p.getId()));
         	    sb.append(String.format("%-4d", p.getNerc_id()));
-        	    sb.append(String.format("%-4ds ", p.getInizio()));
-        	    sb.append(String.format("%-4d\n", p.getFine()));
+        	    sb.append(String.format("%-9s ", p.getInizio()));
+        	    sb.append(String.format("%-9s", p.getFine()));
+        	    sb.append(String.format("%-4d\n", p.getPersone()));
     		}
     		txtResult.appendText(sb.toString());
     				

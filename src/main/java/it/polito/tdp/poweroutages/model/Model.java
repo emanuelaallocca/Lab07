@@ -1,5 +1,6 @@
 package it.polito.tdp.poweroutages.model;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.List;
 
@@ -10,8 +11,10 @@ public class Model {
 	PowerOutageDAO podao;
 	private List <PowerOutages> soluzione;
 	private List <PowerOutages> partenza;
-	private int massimoPersoneSoluzione;
+	 public int massimoPersoneSoluzione;
 	private List <PowerOutages> parziale;
+	private double numOreParziale;
+	
 	public Model(){
 		podao = new PowerOutageDAO();
 	}
@@ -28,32 +31,43 @@ public class Model {
 		List <PowerOutages> parziale = new ArrayList<>();
 		partenza = podao.getPowerOutagesList(nerc);
 		soluzione = new ArrayList<>();
+		parziale =new ArrayList<>();
+		numOreParziale =0;
 		massimoPersoneSoluzione=0;
-	    cerca(parziale, 1, massimoOre, massimoAnni);
-			return parziale;
+	    cerca(parziale, 0, massimoOre, massimoAnni);
+			return soluzione;
 	}
 
-	private void cerca(List<PowerOutages> parziale2, int livello, int massimoOre, int massimoAnni) {
+	private void cerca(List<PowerOutages> parziale, int livello, int massimoOre, int massimoAnni) {
 		// casi terminali 
 		
-		int numeroOre= conteggioOre(parziale);
+		double numeroOre= conteggioOre(parziale);
 		int numeroAnni = conteggioAnni(parziale);
 		int numeroPersone = conteggioPersone(parziale);
 		
 		if (partenza.isEmpty())
 			return;
 		
-		if (numeroOre> massimoOre || numeroAnni>massimoAnni)
+		if (numeroOre> massimoOre || numeroAnni>massimoAnni) 
+		{
+			System.out.println("*******");
 			return;
-		
-		if (livello == partenza.size())
-			return;
+		}
 		
 		if (numeroPersone> massimoPersoneSoluzione) {
+			System.out.println("****33333***");
 				soluzione = new ArrayList<>(parziale);
 				massimoPersoneSoluzione = numeroPersone;
+				numOreParziale = numeroOre;
+				System.out.println(massimoPersoneSoluzione);
 		
 		}
+		
+		if (livello == partenza.size()) {
+			System.out.println("***fdknhdjbjid****");
+			return;
+		}
+		
 		  
 		// genero il sottoproblema
 		parziale.add(partenza.get(livello));
@@ -61,43 +75,51 @@ public class Model {
 		
 		//backtracking
 		parziale.remove(partenza.get(livello));
-		cerca(parziale, livello+1, massimoOre, massimoAnni);
+     	cerca(parziale, livello+1, massimoOre, massimoAnni);
 		
 	}
 
-	private int conteggioPersone(List<PowerOutages> parziale2) {
-		int persone =0;
-		for (PowerOutages p: parziale2)
-			persone = persone + p.getPersone();
-		return persone;
-	}
-
-	private int conteggioAnni(List<PowerOutages> parziale2) {
+	private int conteggioPersone(List<PowerOutages> parziale) {
 		if (parziale.isEmpty())
 			return 0;
 		
-		PowerOutages vecchio = parziale2.get(0);
-		PowerOutages nuovo= parziale2.get(0);
-		for (PowerOutages p: parziale2) {
+		int persone =0;
+		
+		for (PowerOutages p: parziale)
+			persone = persone + p.getPersone();
+		
+		return persone;
+	}
+
+	private int conteggioAnni(List<PowerOutages> parziale) {
+		if (parziale.isEmpty())
+			return 0;
+		
+		PowerOutages vecchio = parziale.get(0);
+		PowerOutages nuovo= parziale.get(0);
+		
+		for (PowerOutages p: parziale) {
 			if (p.getFine().getYear()>(nuovo.getFine().getYear()))
 				nuovo =p;
 			if(p.getFine().getYear()<(vecchio.getFine().getYear()))
 				vecchio = p;
 		}
+		
 		return (nuovo.getFine().getYear()-vecchio.getFine().getYear());
 	}
 
-	private int conteggioOre(List<PowerOutages> parziale2) {
+	private double conteggioOre(List<PowerOutages> parziale) {
 	
 		if (parziale.isEmpty())
 			return 0;
 		
-		int numeroOre=0;
+		double numeroOre=0;
 		
-		for (PowerOutages p: parziale2)
-			numeroOre = ((p.getInizio().getHour()-p.getFine().getHour())*60+(p.getInizio().getMinute()-p.getFine().getMinute()));
-		
-		return (numeroOre/60);
+		for (PowerOutages p: parziale)
+			numeroOre += Duration.between(p.getInizio(), p.getFine()).toMinutes()/60;
+			//numeroOre = numeroOre +((p.getFine().getHour()-p.getInizio().getHour())*60+(p.getFine().getMinute()-p.getInizio().getMinute()));
+		System.out.println(numeroOre);
+		return numeroOre;
 	}
 
 }
